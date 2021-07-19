@@ -808,6 +808,9 @@ const amazon = async (amazon_buyer_account) => {
                 return false
             }
         }
+        else{
+            return false
+        }
         
     });
 }
