@@ -28,6 +28,7 @@ app.post("/order-process", (req, res) => {
     //scrapper(req.body.amazon_buyer_account)
     if(req.body.token == 'c7cd413e3b646c5e73729fad31732a7f78b613472447cfc15fc22f0cf86d05f4'){
         const result = scrapper(req.body.amazon_buyer_account)
+        console.log('process result',result)
         res.json({ success: result })
     }
     res.json({success:false})
