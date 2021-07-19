@@ -789,7 +789,7 @@ const amazon = async (amazon_buyer_account) => {
         const getProductAsin=resp.data.data
         console.log('totaldata.........', getProductAsin.length);
         console.log('.........');
-        if(getProductAsin.length>0){
+        if(getProductAsin.length > 0){
             for(let index = 0; index < getProductAsin.length ; index++){
                 console.log("order --- ",getProductAsin[index].ref_order_id)
             }
