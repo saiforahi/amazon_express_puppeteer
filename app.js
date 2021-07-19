@@ -27,8 +27,8 @@ app.post("/order-process", (req, res) => {
     //res.send("root route");
     //scrapper(req.body.amazon_buyer_account)
     if(req.body.token == 'c7cd413e3b646c5e73729fad31732a7f78b613472447cfc15fc22f0cf86d05f4'){
-        scrapper(req.body.amazon_buyer_account)
-        res.json({ success: true })
+        const result = scrapper(req.body.amazon_buyer_account)
+        res.json({ success: result })
     }
     res.json({success:false})
 });

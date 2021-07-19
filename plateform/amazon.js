@@ -797,10 +797,12 @@ const amazon = async (amazon_buyer_account) => {
             console.log('Processing order id ------ '+getProductAsin[0].ref_order_id);
             if(getProductAsin.length>0){
                 await fetchDetails(getProductAsin)
+                return true
             }
         } catch (error) {
             console.log('364..error..........', error);
             logger.error({ message: error })
+            return false
         }
     });
 }
