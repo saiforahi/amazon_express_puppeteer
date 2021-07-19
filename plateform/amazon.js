@@ -786,25 +786,27 @@ const amazon = async (amazon_buyer_account) => {
     //const getProductAsin = await Service.sendPostRequest();
     axios.post('https://app.wealthorre.com/api/v1/getAmazonOrderData', {"amazon_buyer_account":amazon_buyer_account}).then(async(resp)=>{
         //console.log('total orders from response ----- ',resp.data.data.length);
-        const getProductAsin=resp.data.data
-        console.log('totaldata.........', getProductAsin.length);
-        console.log('.........');
-        if(getProductAsin.length > 0){
-            for(let index = 0; index < getProductAsin.length ; index++){
-                console.log("order --- ",getProductAsin[index].ref_order_id)
-            }
+        if(resp.data.data.length > 0){
+            const getProductAsin=resp.data.data
+            console.log('totaldata.........', getProductAsin.length);
             console.log('.........');
-            try {
-                console.log('Processing order id ------ '+getProductAsin[0].ref_order_id);
-                await fetchDetails(getProductAsin)
-                return true
-            } catch (error) {
-                console.log('364..error..........', error);
+            if(getProductAsin.length > 0){
+                for(let index = 0; index < getProductAsin.length ; index++){
+                    console.log("order --- ",getProductAsin[index].ref_order_id)
+                }
+                console.log('.........');
+                try {
+                    console.log('Processing order id ------ '+getProductAsin[0].ref_order_id);
+                    await fetchDetails(getProductAsin)
+                    return true
+                } catch (error) {
+                    console.log('364..error..........', error);
+                    return false
+                }
+            }
+            else{
                 return false
             }
-        }
-        else{
-            return false
         }
         
     });
