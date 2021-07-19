@@ -789,21 +789,24 @@ const amazon = async (amazon_buyer_account) => {
         const getProductAsin=resp.data.data
         console.log('totaldata.........', getProductAsin.length);
         console.log('.........');
-        for(let index = 0; index < getProductAsin.length ; index++){
-            console.log("order --- ",getProductAsin[index].ref_order_id)
-        }
-        console.log('.........');
-        try {
-            console.log('Processing order id ------ '+getProductAsin[0].ref_order_id);
-            if(getProductAsin.length>0){
+        if(getProductAsin.length>0){
+            for(let index = 0; index < getProductAsin.length ; index++){
+                console.log("order --- ",getProductAsin[index].ref_order_id)
+            }
+            console.log('.........');
+            try {
+                console.log('Processing order id ------ '+getProductAsin[0].ref_order_id);
                 await fetchDetails(getProductAsin)
                 return true
+            } catch (error) {
+                console.log('364..error..........', error);
+                return false
             }
-        } catch (error) {
-            console.log('364..error..........', error);
-            logger.error({ message: error })
+        }
+        else{
             return false
         }
+        
     });
 }
 // amazon();
