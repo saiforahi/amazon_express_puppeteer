@@ -165,7 +165,7 @@ const otpResolver = async (page,result) => {
     try {
         let res = await axios({
             method: 'post',
-            url: 'https://otp.wealthorre.com/sample/getDatas.php',
+            url: 'http://otp.wealthorreds.com/sample/getDatas.php',
             data: {
                 "secret": result['otp_secret_key']
             }
@@ -422,25 +422,29 @@ const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, resu
             await secondCaptchaSolver(productViewPage)
             console.log('click to continue');
             await productViewPage.waitForTimeout(4000);
-            
-            await otpResolver(productViewPage,result);
+            if(await productViewPage.$('input[name="otpDeviceContext"]')){
+                await otpResolver(productViewPage,result);    
+            }
             //select address for Deliver
             console.log('result--------', result);
-            await productViewPage.waitForNavigation({ timeout: 0 });
+            // await productViewPage.waitForNavigation({ timeout: 0 });
             //turbo-checkout-pyo-button
-            await productViewPage.waitForTimeout(4000);
-            await productViewPage.evaluate(() => {
-                return new Promise((res, rej) => {
-                    let placeButton = document.querySelectorAll('#turbo-checkout-pyo-button');
-                    console.log(placeButton);
-                    if (placeButton.length > 0) {
-                        placeButton[0].click();
-                    }
-                    res()
-                })
-            });
+            if(await productViewPage.$$("#turbo-checkout-pyo-button")){
+                await productViewPage.waitForTimeout(4000);
+                await productViewPage.evaluate(() => {
+                    return new Promise((res, rej) => {
+                        let placeButton = document.querySelectorAll('#turbo-checkout-pyo-button');
+                        console.log(placeButton);
+                        if (placeButton.length > 0) {
+                            placeButton[0].click();
+                        }
+                        res()
+                    })
+                });
+            }
+            
             //PO check
-            await productViewPage.waitForTimeout(4000);
+            
             if(await productViewPage.$('span.a-button-inner input[value="Continue"]')){
                 console.log('PO found and pressing continue ------ ')
                 await productViewPage.waitForTimeout(4000);
@@ -451,6 +455,7 @@ const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, resu
                         res()
                     })
                 })
+                await productViewPage.waitForNavigation({ timeout: 0 });
             }
             //shipper add
             if(await productViewPage.$$('.a-color-base.clickable-heading.expand-collapsed-panel-trigger').length>0){

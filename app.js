@@ -32,7 +32,9 @@ app.post("/order-process", (req, res) => {
         // console.log('process result',result)
         // res.json({ success: result })
     }
-    res.json({success:false})
+    else{
+        res.json({success:false})
+    }
 });
 
 app.listen(port, (req, res) => {
