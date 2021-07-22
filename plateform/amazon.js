@@ -260,11 +260,49 @@ const get_proxy = async (asin, purchaseOrderId, customerOrderId, result,  orderP
     // }
     purchaseProduct('196.19.212.231:14806',asin, purchaseOrderId, customerOrderId, result,  orderPrice)
 }
+const one_time_purchase = async(page)=>{
+    await page.waitForTimeout(4000);
+        if(await page.$('#buyNew_cbb')){
+            console.log('buy now button pressing')
+            await page.evaluate(() => {
+                return new Promise((res, rej) => {
+                    let OnetimepurchaseLink = document.querySelectorAll('#buyNew_cbb');
+                    if (OnetimepurchaseLink.length > 0) {
+                        OnetimepurchaseLink[0].click();
+                    }
+                    res()
+                })
+            });
+        }else if(await page.$('#buy-now-button')){
+            console.log('buy now button pressing')
+            await page.evaluate(() => {
+                return new Promise((res, rej) => {
+                    let OnetimepurchaseLink = document.querySelectorAll('#buy-now-button');
+                    if (OnetimepurchaseLink.length > 0) {
+                        OnetimepurchaseLink[0].click();
+                    }
+                    res()
+                })
+            });
+        }
+        // else if( await productViewPage.$('#a-autoid-2-announce')){
+        //     console.log('buy now button pressing')
+        //     await productViewPage.evaluate(() => {
+        //         return new Promise((res, rej) => {
+        //             let OnetimepurchaseLink = document.querySelectorAll('#a-autoid-2-announce');
+        //             if (OnetimepurchaseLink.length > 0) {
+        //                 OnetimepurchaseLink[0].click();
+        //             }
+        //             res()
+        //         })
+        //     });
+        // }
+}
 const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, result,  orderPrice) => {
     let amazonProductPrice = 0, details = {}, amazonOrderNumber = '';
     console.log('proxy_ip------', result['proxy_ip'])
     const browser = await puppeteer.launch({
-        headless: true,
+        headless: false,
         timeout: 0,
         ignoreHTTPSErrors: true,
         args: [
@@ -295,6 +333,7 @@ const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, resu
         productViewPage.setDefaultNavigationTimeout(0);
         await productViewPage.setViewport({ width: 1366, height: 700 });
         let platefromUrl = 'https://www.amazon.com/dp/' + String(asin).trim();
+        //let platefromUrl = 'https://www.amazon.com/dp/B06XX85RSS';
         console.log('product asin ---- ',asin)
         console.log('url to visit ----- ',platefromUrl.trim())
         await productViewPage.goto(platefromUrl.trim(), {
@@ -332,59 +371,38 @@ const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, resu
         }
         
         console.log('orderPrice------', typeof orderPrice, orderPrice, '..amazonProductPrice.......', typeof amazonProductPrice, amazonProductPrice);
-        console.log('if calling-----------');
         //One-time purchase:
-        await productViewPage.waitForTimeout(4000);
-        if(await productViewPage.$('#buyNew_cbb')){
-            await productViewPage.evaluate(() => {
-                return new Promise((res, rej) => {
-                    let OnetimepurchaseLink = document.querySelectorAll('#buyNew_cbb');
-                    if (OnetimepurchaseLink.length > 0) {
-                        OnetimepurchaseLink[0].click();
-                    }
-                    res()
-                })
-            });
-        }else if(await productViewPage.$('#buy-now-button')){
-            await productViewPage.evaluate(() => {
-                return new Promise((res, rej) => {
-                    let OnetimepurchaseLink = document.querySelectorAll('#buy-now-button');
-                    if (OnetimepurchaseLink.length > 0) {
-                        OnetimepurchaseLink[0].click();
-                    }
-                    res()
-                })
-            });
-        }
-        await productViewPage.waitForTimeout(4000);
-        if (await productViewPage.$('#buy-now-button') || await productViewPage.$('#buyNew_cbb')) {
+        
+        console.log('if block')
+        if (await productViewPage.$('#buy-now-button')) {
             //selct qyt
-            let SelectedOption = await productViewPage.evaluate((result) => {
-                let isSelected = [];
-                let optionEl = document.getElementsByName("quantity");
-                if (optionEl && optionEl.length > 0) {
-                    optionEl = optionEl[0].options;
-                    for (let k = 0; k < optionEl.length; k++) {
-                        if (optionEl[k].text == result['Sum(aol.orderLineQuantity)']) {
-                            isSelected = optionEl[k].value
+            if(await productViewPage.$('select[name="quantity"]')){
+                console.log('gathering quantities ...... ')
+                let SelectedOption = await productViewPage.evaluate((result) => {
+                    let isSelected = [];
+                    let optionEl = document.getElementsByName("quantity");
+                    if (optionEl && optionEl.length > 0) {
+                        optionEl = optionEl[0].options;
+                        for (let k = 0; k < optionEl.length; k++) {
+                            if (optionEl[k].text == result['Sum(aol.orderLineQuantity)']) {
+                                isSelected = optionEl[k].value
+                            }
                         }
                     }
+                    return isSelected;
+                }, result);
+                console.log('SelectedOption..272...', SelectedOption);
+                if(await productViewPage.$('select[name="quantity"]') && SelectedOption){
+                    await productViewPage.select('select[name="quantity"]', SelectedOption);
                 }
-                return isSelected;
-            }, result);
-            console.log('SelectedOption..272...', SelectedOption);
-            if(await productViewPage.$('select[name="quantity"]') && SelectedOption){
-                await productViewPage.select('select[name="quantity"]', SelectedOption);
             }
             
-            let buyNowButton = await productViewPage.$$('#buy-now-button');
-            console.log('buyNowButton-----', buyNowButton.length);
-            await buyNowButton[0].click();
-            // await productViewPage.waitForSelector("#ap_email", { visible: true, timeout: 0 });
-            console.log('enter email...', result['amazon_user_name']);
+            await one_time_purchase(productViewPage)
+            //await productViewPage.waitForSelector("#ap_email", { visible: true, timeout: 0 });
             // await productViewPage.waitForTimeout(4000);
             await productViewPage.waitForNavigation({ timeout: 0 });
             //email
+            console.log('enter email...', result['amazon_user_name']);
             await productViewPage.evaluate(async (EMAIL) => {
                 return new Promise(async (res, rej) => {
                     let emailEl = document.getElementById('ap_email');
@@ -815,11 +833,7 @@ const amazon = async (amazon_buyer_account) => {
                 
             } catch (error) {
                 console.log('364..error..........', error);
-                
             }
-        }
-        else{
-            return false
         }
     });
 }
