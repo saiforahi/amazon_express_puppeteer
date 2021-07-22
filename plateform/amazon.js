@@ -262,41 +262,41 @@ const get_proxy = async (asin, purchaseOrderId, customerOrderId, result,  orderP
 }
 const one_time_purchase = async(page)=>{
     await page.waitForTimeout(4000);
-        if(await page.$('#buyNew_cbb')){
-            console.log('buy now button pressing')
-            await page.evaluate(() => {
-                return new Promise((res, rej) => {
-                    let OnetimepurchaseLink = document.querySelectorAll('#buyNew_cbb');
-                    if (OnetimepurchaseLink.length > 0) {
-                        OnetimepurchaseLink[0].click();
-                    }
-                    res()
-                })
-            });
-        }else if(await page.$('#buy-now-button')){
-            console.log('buy now button pressing')
-            await page.evaluate(() => {
-                return new Promise((res, rej) => {
-                    let OnetimepurchaseLink = document.querySelectorAll('#buy-now-button');
-                    if (OnetimepurchaseLink.length > 0) {
-                        OnetimepurchaseLink[0].click();
-                    }
-                    res()
-                })
-            });
-        }
-        // else if( await productViewPage.$('#a-autoid-2-announce')){
-        //     console.log('buy now button pressing')
-        //     await productViewPage.evaluate(() => {
-        //         return new Promise((res, rej) => {
-        //             let OnetimepurchaseLink = document.querySelectorAll('#a-autoid-2-announce');
-        //             if (OnetimepurchaseLink.length > 0) {
-        //                 OnetimepurchaseLink[0].click();
-        //             }
-        //             res()
-        //         })
-        //     });
-        // }
+    if(await page.$('#buy-now-button')){
+        console.log('buy now button pressing ----- buy-now-button')
+        await page.evaluate(() => {
+            return new Promise((res, rej) => {
+                let OnetimepurchaseLink = document.getElementById('buy-now-button');
+                if (OnetimepurchaseLink) {
+                    OnetimepurchaseLink.click();
+                }
+                res()
+            })
+        });
+    }else if(await page.$('#buyNew_cbb')){
+        console.log('buy now button pressing ------- buyNew_cbb')
+        await page.evaluate(() => {
+            return new Promise((res, rej) => {
+                let OnetimepurchaseLink = document.getElementById('buyNew_cbb');
+                if (OnetimepurchaseLink) {
+                    OnetimepurchaseLink.click();
+                }
+                res()
+            })
+        });
+    }
+    // else if( await productViewPage.$('#a-autoid-2-announce')){
+    //     console.log('buy now button pressing')
+    //     await productViewPage.evaluate(() => {
+    //         return new Promise((res, rej) => {
+    //             let OnetimepurchaseLink = document.querySelectorAll('#a-autoid-2-announce');
+    //             if (OnetimepurchaseLink.length > 0) {
+    //                 OnetimepurchaseLink[0].click();
+    //             }
+    //             res()
+    //         })
+    //     });
+    // }
 }
 const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, result,  orderPrice) => {
     let amazonProductPrice = 0, details = {}, amazonOrderNumber = '';
@@ -399,7 +399,7 @@ const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, resu
             
             await one_time_purchase(productViewPage)
             //await productViewPage.waitForSelector("#ap_email", { visible: true, timeout: 0 });
-            // await productViewPage.waitForTimeout(4000);
+            //await productViewPage.waitForTimeout(4000);
             await productViewPage.waitForNavigation({ timeout: 0 });
             //email
             console.log('enter email...', result['amazon_user_name']);
@@ -451,25 +451,25 @@ const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, resu
             console.log('click to continue');
             await productViewPage.waitForTimeout(4000);
             if(await productViewPage.$('input[name="otpDeviceContext"]')){
-                await otpResolver(productViewPage,result);    
+                await otpResolver(productViewPage,result); 
+                await productViewPage.waitForNavigation({ timeout: 0 });   
             }
             //select address for Deliver
             console.log('result--------', result);
-            // await productViewPage.waitForNavigation({ timeout: 0 });
             //turbo-checkout-pyo-button
-            if(await productViewPage.$$("#turbo-checkout-pyo-button")){
-                await productViewPage.waitForTimeout(4000);
-                await productViewPage.evaluate(() => {
-                    return new Promise((res, rej) => {
-                        let placeButton = document.querySelectorAll('#turbo-checkout-pyo-button');
-                        console.log(placeButton);
-                        if (placeButton.length > 0) {
-                            placeButton[0].click();
-                        }
-                        res()
-                    })
-                });
-            }
+            // if(await productViewPage.$$("#turbo-checkout-pyo-button")){
+            //     await productViewPage.waitForTimeout(4000);
+            //     await productViewPage.evaluate(() => {
+            //         return new Promise((res, rej) => {
+            //             let placeButton = document.querySelectorAll('#turbo-checkout-pyo-button');
+            //             console.log(placeButton);
+            //             if (placeButton.length > 0) {
+            //                 placeButton[0].click();
+            //             }
+            //             res()
+            //         })
+            //     });
+            // }
             
             //PO check
             
