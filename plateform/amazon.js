@@ -345,9 +345,19 @@ const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, resu
                     res()
                 })
             });
+        }else if(await productViewPage.$('#buy-now-button')){
+            await productViewPage.evaluate(() => {
+                return new Promise((res, rej) => {
+                    let OnetimepurchaseLink = document.querySelectorAll('#buy-now-button');
+                    if (OnetimepurchaseLink.length > 0) {
+                        OnetimepurchaseLink[0].click();
+                    }
+                    res()
+                })
+            });
         }
         await productViewPage.waitForTimeout(4000);
-        if (await productViewPage.$('#buy-now-button')) {
+        if (await productViewPage.$('#buy-now-button') || await productViewPage.$('#buyNew_cbb')) {
             //selct qyt
             let SelectedOption = await productViewPage.evaluate((result) => {
                 let isSelected = [];
