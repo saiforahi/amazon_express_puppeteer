@@ -302,7 +302,7 @@ const purchaseProduct = async (curl,asin, purchaseOrderId, customerOrderId, resu
     let amazonProductPrice = 0, details = {}, amazonOrderNumber = '';
     console.log('proxy_ip------', result['proxy_ip'])
     const browser = await puppeteer.launch({
-        headless: false,
+        headless: true,
         timeout: 0,
         ignoreHTTPSErrors: true,
         args: [
