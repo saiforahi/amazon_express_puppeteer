@@ -1,5 +1,6 @@
 require('dotenv').config({ path: __dirname +`/.env` });
 const scrapper = require('./scrapper');
+const camel_visitor = require('./camel_tracker');
 const express = require("express");
 const app = express();
 const path = require("path");
@@ -22,6 +23,15 @@ process.on("uncaughtException", function (err) {
 app.get("/", (req, res) => {
     res.send("<h3>Amazon Express Puppeteer</h3><code>version 1.0</code>");
     //scrapper(req.body.amazon_buyer_account)
+});
+app.post("/product-track", (req, res) => {
+    if(req.body.token == 'c7cd413e3b646c5e73729fad31732a7f78b613472447cfc15fc22f0cf86d05f4'){
+        res.json({ success: true })
+        camel_visitor()
+    }
+    else{
+        res.json({success:false})
+    }
 });
 app.post("/order-process", (req, res) => {
     // res.send("processing...");
