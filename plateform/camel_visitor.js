@@ -5,7 +5,6 @@ const Service = require('../server/service/service');
 const axios = require('axios');
 const path = require('path');
 const logger = require('../logger/logger');
-const { doc } = require('prettier');
 
 const login = async(page)=>{
     await page.evaluate(()=>{
@@ -58,8 +57,9 @@ const trackProduct = async (data) => {
         await camel_page.setViewport({ width: 1366, height: 700 });
         let platefromUrl = 'https://camelcamelcamel.com/'
         let loginUrl = "https://camelcamelcamel.com/login"
+        await camel_page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.125 Safari/537.36')
         await camel_page.goto(loginUrl.trim(), {
-            waitUntil: 'load', timeout: 0
+            waitUntil: 'networkidle0', timeout: 0
         });
         // if(Service.check_status()){
         //     login(camel_page)
@@ -71,6 +71,9 @@ const trackProduct = async (data) => {
         //         return;
         //     })
         // }
+        await camel_page.waitForTimeout(4000);
+        let imagePath1 = path.join(__dirname, "..", "product.png");
+        await camel_page.screenshot({ path: imagePath1 });
         await camel_page.evaluate(()=>{
             return new Promise((res,rej)=>{
                 document.getElementById('login').setAttribute('value','softappetite@gmail.com')
@@ -99,6 +102,7 @@ const trackProduct = async (data) => {
             })
         })
         await camel_page.waitForTimeout(10000)
+        await camel_page.screenshot({ path: imagePath1 });
         let pages = await browser.pages();
         await Promise.all(pages.map(page =>page.close()));
         await browser.close();
